@@ -1,0 +1,17 @@
+# .gitignore 文件内容
+
+# 虚拟环境
+venv/
+
+# Python 缓存文件
+__pycache__/
+*.pyc
+
+# 环境变量文件
+.env
+
+# SQLite 数据库文件（这是你本地的数据，不需要上传）
+weatherInfo.db
+
+# IDE 配置（如果你用 VS Code）
+.vscode/
