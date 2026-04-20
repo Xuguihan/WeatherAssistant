@@ -48,7 +48,7 @@ def process_weather_logic(city_name: str)->str:
     # 解析天气数据 (变成好读的列表)
     parsed_weather = weather_query.parse_weather_data(raw_data)
     # 调用 LLM 获取建议
-    ai_advice = llm_service.get_ai_advice(parsed_weather)
+    ai_advice = llm_service.get_ai_advice(city_name,parsed_weather)
     # --- 逻辑结束 ---
     return ai_advice
 
