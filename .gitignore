@@ -15,3 +15,4 @@ weatherInfo.db
 
 # IDE 配置（如果你用 VS Code）
 .vscode/
+.idea/

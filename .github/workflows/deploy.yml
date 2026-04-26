@@ -1,0 +1,56 @@
+name: Build and Deploy to Alibaba Cloud
+
+# 触发条件：当代码推送到 main 分支时触发（如果你的主分支叫 master，请改为 master）
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 登录阿里云 Docker 仓库
+      - name: Login to Alibaba Cloud ACR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.ALIYUN_REGISTRY }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
+      # 3. 构建并推送镜像
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_NAMESPACE }}/my-app:latest
+
+      # 4. 通过 SSH 远程连接服务器并重启容器
+      - name: Deploy to ECS via SSH
+        uses: appleboy/ssh-action@v1.0.1
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            echo "开始拉取最新镜像..."
+            docker pull ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_NAMESPACE }}/my-app:latest
+            
+            echo "重启容器..."
+            docker stop my-weather-bot || true
+            docker rm my-weather-bot || true
+            
+            docker run -d \
+              --name my-weather-bot \
+              -p 8001:8000 \
+              -v /root/.env:/app/.env \
+              --restart always \
+              ${{ secrets.ALIYUN_REGISTRY }}/${{ secrets.ALIYUN_NAMESPACE }}/my-app:latest
+            
+            echo "部署完成！"

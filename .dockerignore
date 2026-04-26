@@ -1,0 +1,18 @@
+# 1. 敏感信息
+.env
+
+# 2. 本地环境与缓存
+venv/
+__pycache__/
+*.pyc
+
+# 3. 版本控制与编辑器
+.git
+.gitignore
+.vscode/
+
+# 4. 数据库文件（建议剥离，实现数据持久化）
+weatherInfo.db
+
+# 【关键】必须显式忽略它自己
+.dockerignore
